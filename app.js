@@ -28,6 +28,9 @@ const specs = swaggerJSDoc({
 
 const app = express()
 
+app.get('/', (req, res) => res.redirect('/api'))
+
+
 app.use('/api', swaggerUI.serve, swaggerUI.setup(specs))
 
 //middlewares
@@ -35,7 +38,7 @@ app.use(cors())
 app.use(helmet())
 app.use(morgan('dev'))
 app.use(express.urlencoded({ extended: true }))
- app.use(express.json())
+app.use(express.json())
 
 //registered routes
 app.use("/login", loginRouter)
