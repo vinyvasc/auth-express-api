@@ -8,6 +8,27 @@ const swaggerJSDoc = require('swagger-jsdoc')
 const port = process.env.PORT || 3000
 const serverUrl = process.env.SERVER_URL || `http://localhost:${port}`
 const loginRouter = require('./routes/login.js')
+const { Sequelize } = require('sequelize')
+const dbUser = process.env.DB_USER
+const dbPassword = process.env.DB_PASSWORD
+const dbHost = process.env.DB_HOST
+const dbPort = process.env.DB_PORT
+const dbName = process.env.DB_NAME
+
+const sequelize = new Sequelize(
+    `postgres://${dbUser}:${dbPassword}@${dbHost}:${dbPort}/${dbName}`
+)
+
+async function testDbConnection(){
+    try {
+        await sequelize.authenticate();
+        console.log('Connection has been established successfully.')
+    } catch (error) {
+        console.error('Unable to connect to the database:', error)
+    }
+}
+
+testDbConnection();
 
 //swagger config
 const specs = swaggerJSDoc({
@@ -47,3 +68,5 @@ app.use("/login", loginRouter)
 app.listen(port, () => {
     console.log(`server listening on port ${port}`)
 })
+
+module.exports = { sequelize }
