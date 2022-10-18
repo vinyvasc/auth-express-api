@@ -2,6 +2,7 @@ const express = require('express')
 const jwt = require('jsonwebtoken')
 const User = require('../models/user')
 const router = express.Router()
+const bcrypt = require('bcrypt')
 
 /**
  * @swagger
@@ -50,7 +51,7 @@ router.post("/", async (req, res) => {
             return res.status(404).send({ message: 'user not found' })
         else if(
             req.body.username == user.username && 
-            req.body.password !== user.password
+            !bcrypt.compare(req.body.password, user.password)
         )
             return res.status(400).send({ message: 'wrong password' })
 
