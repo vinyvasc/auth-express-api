@@ -1,12 +1,7 @@
 const express = require('express')
 const jwt = require('jsonwebtoken')
+const User = require('../models/user')
 const router = express.Router()
-
-const userMock = {
-    id: 1,
-    username: 'admin',
-    password: '123456',
-}
 
 /**
  * @swagger
@@ -42,25 +37,39 @@ const userMock = {
  *                  description: Not found
  *                  
  */
-router.post("/", (req, res) => {
+router.post("/", async (req, res) => {
     try {
-        const user = { ...userMock }
-        if (req.body.username != userMock.username)
+        const user = await User.findOne({
+            attributes: [
+            'id','username','password'
+            ],
+            where: { username: req.body.username }
+        })
+        
+        if (!user)
             return res.status(404).send({ message: 'user not found' })
-
         else if(
             req.body.username == user.username && 
             req.body.password !== user.password
         )
             return res.status(400).send({ message: 'wrong password' })
 
-        const token = jwt.sign(user, process.env.TOKEN_SECRET, { expiresIn: '24h'})
+        console.log(user.dataValues)
+        const payload = {
+            username: user.username,
+            password: user.password
+        }
 
-        delete user.password
+        const token = jwt.sign(payload, process.env.TOKEN_SECRET, { expiresIn: '24h' })
 
-        res.send({ ...user, token})
+        res.status(200).send({
+            id: user.id,
+            username: user.username,
+            token: token
+        })
 
     } catch (error) {
+        console.log(error)
         return res.status(500).send({ message: 'internal server error'})
     }
     
