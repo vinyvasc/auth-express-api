@@ -45,7 +45,7 @@ router.post("/", async (req, res) => {
             ],
             where: { username: req.body.username }
         })
-        
+
         if (!user)
             return res.status(404).send({ message: 'user not found' })
         else if(
@@ -54,7 +54,6 @@ router.post("/", async (req, res) => {
         )
             return res.status(400).send({ message: 'wrong password' })
 
-        console.log(user.dataValues)
         const payload = {
             username: user.username,
             password: user.password
